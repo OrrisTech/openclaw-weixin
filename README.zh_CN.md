@@ -73,38 +73,78 @@ openclaw config set session.dmScope per-account-channel-peer
 
 ## Agent 绑定
 
-可以为微信账号绑定特定的 Agent，实现微信消息路由到指定的 Agent：
+可以为微信账号绑定特定的 Agent，实现该账号的消息路由到指定的 Agent，而非默认 Agent。
 
-### 绑定命令
+### 为什么要绑定 Agent？
 
-登录成功后会显示账号 ID，然后使用以下命令绑定：
+默认情况下，所有微信消息都路由到主 Agent。通过 Agent 绑定，您可以：
 
-```bash
-openclaw agents bind --agent <agentId> --bind openclaw-weixin:<accountId>
+- 将不同微信账号的消息路由到不同的专业 Agent（如内容创作 Agent、客服 Agent）
+- 为不同的微信账号配置不同的 AI 模型
+- 为每个账号维护独立的会话上下文
+
+### 工作原理
+
+OpenClaw 的 `bindings` 系统将渠道 + 账号映射到 Agent：
+
+```json
+{
+  "bindings": [
+    { "agentId": "my-agent", "match": { "channel": "openclaw-weixin", "accountId": "68af40bbb612-im-bot" } }
+  ]
+}
 ```
 
-### 示例
+### 绑定流程
+
+**步骤 1: 登录微信**
 
 ```bash
-# 登录微信（登录成功后会显示 accountId）
 openclaw channels login --channel openclaw-weixin
+```
 
-# 绑定到指定 agent
+登录成功后，会显示：
+```
+✅ 与微信连接成功！账号ID: 68af40bbb612-im-bot，可使用 openclaw agents bind --agent <agentId> --bind openclaw-weixin:68af40bbb612-im-bot 绑定到 Agent
+```
+
+**步骤 2: 绑定到 Agent**
+
+```bash
 openclaw agents bind --agent my-agent --bind openclaw-weixin:68af40bbb612-im-bot
+```
 
-# 重启 gateway 使配置生效
+**步骤 3: 重启 Gateway**
+
+```bash
 openclaw gateway restart
 ```
 
 ### 查看当前绑定
 
 ```bash
+# 查看所有绑定
 openclaw config get bindings
+
+# 查看所有已注册的微信账号
+openclaw channels list
+```
+
+### 多账号绑定
+
+可以为不同的微信账号绑定到不同的 Agent：
+
+```bash
+# 将账号 A 绑定到 agent-1
+openclaw agents bind --agent agent-1 --bind openclaw-weixin:account-a-im-bot
+
+# 将账号 B 绑定到 agent-2
+openclaw agents bind --agent agent-2 --bind openclaw-weixin:account-b-im-bot
 ```
 
 ### 解绑
 
-如果需要解除绑定，可以手动编辑 `~/.openclaw/openclaw.json`，移除对应的 bindings 条目，或使用 `openclaw agents unbind` 命令。
+如需解除绑定，请编辑 `~/.openclaw/openclaw.json`，从 `bindings` 数组中移除对应的条目，然后重启 Gateway。
 
 ## 后端 API 协议
 

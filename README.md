@@ -74,38 +74,78 @@ openclaw config set session.dmScope per-account-channel-peer
 
 ## Agent Binding
 
-You can bind a WeChat account to a specific Agent, so messages are routed to the designated Agent:
+You can bind a WeChat account to a specific Agent, so messages from that account are routed to the designated Agent instead of the default agent.
 
-### Binding Command
+### Why Agent Binding?
 
-After successful login, the account ID will be displayed. Use the following command to bind:
+By default, all WeChat messages go to the main agent. With agent binding, you can:
 
-```bash
-openclaw agents bind --agent <agentId> --bind openclaw-weixin:<accountId>
+- Route WeChat messages to specialized agents (e.g., a content creation agent for one account, a customer service agent for another)
+- Use different AI models for different WeChat accounts
+- Maintain separate conversation contexts per account
+
+### How It Works
+
+The OpenClaw `bindings` system maps channels + accounts to agents:
+
+```json
+{
+  "bindings": [
+    { "agentId": "my-agent", "match": { "channel": "openclaw-weixin", "accountId": "68af40bbb612-im-bot" } }
+  ]
+}
 ```
 
-### Example
+### Binding Flow
+
+**Step 1: Login to WeChat**
 
 ```bash
-# Login to WeChat (accountId will be shown after success)
 openclaw channels login --channel openclaw-weixin
+```
 
-# Bind to a specific agent
+After successful login, you'll see:
+```
+✅ 与微信连接成功！账号ID: 68af40bbb612-im-bot，可使用 openclaw agents bind --agent <agentId> --bind openclaw-weixin:68af40bbb612-im-bot 绑定到 Agent
+```
+
+**Step 2: Bind to an Agent**
+
+```bash
 openclaw agents bind --agent my-agent --bind openclaw-weixin:68af40bbb612-im-bot
+```
 
-# Restart gateway to apply changes
+**Step 3: Restart Gateway**
+
+```bash
 openclaw gateway restart
 ```
 
 ### View Current Bindings
 
 ```bash
+# View all bindings
 openclaw config get bindings
+
+# View all registered WeChat accounts
+openclaw channels list
+```
+
+### Multiple Accounts
+
+You can bind different WeChat accounts to different agents:
+
+```bash
+# Bind account A to agent-1
+openclaw agents bind --agent agent-1 --bind openclaw-weixin:account-a-im-bot
+
+# Bind account B to agent-2
+openclaw agents bind --agent agent-2 --bind openclaw-weixin:account-b-im-bot
 ```
 
 ### Unbind
 
-To remove a binding, manually edit `~/.openclaw/openclaw.json` to remove the corresponding bindings entry, or use `openclaw agents unbind`.
+Remove a binding by editing `~/.openclaw/openclaw.json` and removing the corresponding entry from the `bindings` array, then restart the gateway.
 
 ## Backend API Protocol
 

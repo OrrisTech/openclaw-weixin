@@ -4,6 +4,24 @@
 
 本项目遵循 [Keep a Changelog](https://keepachangelog.com/) 格式。
 
+## [2.2.0] - 2026-04-18
+
+### 新增
+
+- **Agent 绑定支持：** 为微信插件添加 Agent 绑定功能，实现微信账号消息路由到指定的 OpenClaw Agent。
+  - 在插件 meta 中添加 `forceAccountBinding: true`，使 `openclaw channels list` 始终显示账号信息
+  - 在 `ResolvedWeixinAccount` 类型中添加 `userId` 字段
+  - 更新 `describeAccount` 以在无 name 时显示 `userId`，便于识别账号
+  - 登录成功后显示绑定命令提示（`openclaw agents bind --agent <agentId> --bind openclaw-weixin:<accountId>`）
+  - 在中英文 README 中添加 Agent 绑定功能文档
+
+### 注意
+
+此版本发布在 `@ericmmj/openclaw-weixin` npm scope。安装命令：
+```bash
+npm install @ericmmj/openclaw-weixin
+```
+
 ## [2.1.7] - 2026-04-07
 
 ### 修复

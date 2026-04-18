@@ -4,6 +4,24 @@
 
 This project follows the [Keep a Changelog](https://keepachangelog.com/) format.
 
+## [2.2.0] - 2026-04-18
+
+### Added
+
+- **Agent Binding Support:** Add capability to bind WeChat accounts to specific OpenClaw agents for message routing.
+  - Add `forceAccountBinding: true` to plugin meta so account info is always displayed in `openclaw channels list`
+  - Include `userId` field in `ResolvedWeixinAccount` type
+  - Update `describeAccount` to show `userId` as fallback name for easier account identification
+  - Show binding command hint after successful QR login (`openclaw agents bind --agent <agentId> --bind openclaw-weixin:<accountId>`)
+  - Document agent binding feature in English and Chinese README
+
+### Note
+
+This version is published to `@ericmmj/openclaw-weixin` npm scope. Install with:
+```bash
+npm install @ericmmj/openclaw-weixin
+```
+
 ## [2.1.7] - 2026-04-07
 
 ### Fixed
