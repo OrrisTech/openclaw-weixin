@@ -178,6 +178,7 @@ export const weixinPlugin: ChannelPlugin<ResolvedWeixinAccount> = {
     ],
   },
   reload: { configPrefixes: ["channels.openclaw-weixin"] },
+  gatewayMethods: ["web.login.start", "web.login.wait"],
   config: {
     listAccountIds: (cfg) => listWeixinAccountIds(cfg),
     resolveAccount: (cfg, accountId) => resolveWeixinAccount(cfg, accountId),
