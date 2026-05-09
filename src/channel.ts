@@ -400,6 +400,7 @@ export const weixinPlugin: ChannelPlugin<ResolvedWeixinAccount> = {
         runtime: ctx.runtime,
         abortSignal: ctx.abortSignal,
         setStatus: ctx.setStatus,
+        channelRuntime: ctx.channelRuntime,
       });
     },
     loginWithQrStart: async ({ accountId, force, timeoutMs, verbose }) => {

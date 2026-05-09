@@ -5,7 +5,7 @@ import { getUpdates } from "../api/api.js";
 import { WeixinConfigManager } from "../api/config-cache.js";
 import { SESSION_EXPIRED_ERRCODE, pauseSession, getRemainingPauseMs } from "../api/session-guard.js";
 import { processOneMessage } from "../messaging/process-message.js";
-import { getWeixinRuntime, waitForWeixinRuntime } from "../runtime.js";
+import { resolveWeixinChannelRuntime } from "../runtime.js";
 import { getSyncBufFilePath, loadGetUpdatesBuf, saveGetUpdatesBuf } from "../storage/sync-buf.js";
 import { logger } from "../util/logger.js";
 import type { Logger } from "../util/logger.js";
@@ -29,6 +29,7 @@ export type MonitorWeixinOpts = {
   longPollTimeoutMs?: number;
   /** Gateway status callback — called on each successful poll and inbound message. */
   setStatus?: (next: ChannelAccountSnapshot) => void;
+  channelRuntime?: PluginRuntime["channel"];
 };
 
 /**
@@ -50,14 +51,13 @@ export async function monitorWeixinProvider(opts: MonitorWeixinOpts): Promise<vo
   const errLog = opts.runtime?.error ?? ((m: string) => log(m));
   const aLog: Logger = logger.withAccount(accountId);
 
-  aLog.info(`waiting for Weixin runtime...`);
+  aLog.info(`resolving Weixin channel runtime...`);
   let channelRuntime: PluginRuntime["channel"];
   try {
-    const pluginRuntime = await waitForWeixinRuntime();
-    channelRuntime = pluginRuntime.channel;
-    aLog.info(`Weixin runtime acquired, channelRuntime type: ${typeof channelRuntime}`);
+    channelRuntime = await resolveWeixinChannelRuntime({ channelRuntime: opts.channelRuntime });
+    aLog.info(`Weixin channel runtime acquired, channelRuntime type: ${typeof channelRuntime}`);
   } catch (err) {
-    aLog.error(`waitForWeixinRuntime() failed: ${String(err)}`);
+    aLog.error(`resolveWeixinChannelRuntime() failed: ${String(err)}`);
     throw err;
   }
 
